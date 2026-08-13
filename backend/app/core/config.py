@@ -33,6 +33,9 @@ class Settings(BaseSettings):
     # Scheduled ingestion (WBS 1.1.2).
     ingestion_enabled: bool = False
     ingestion_interval_seconds: float = 900.0
+    # Persist polled observations to the database (WBS 1.1.3). When false, the
+    # in-memory sink is used (useful for local experiments and tests).
+    ingestion_persist: bool = False
     # JSON list of {"name","latitude","longitude"} objects, e.g.
     # '[{"name":"London","latitude":51.5074,"longitude":-0.1278}]'
     ingestion_locations: list[dict] = []

@@ -24,6 +24,18 @@ class IngestionRuntime:
         self.sink: ObservationSink = sink or InMemoryObservationSink()
         self.scheduler: IngestionScheduler | None = None
 
+    def configure_sink(self, settings: Settings | None = None) -> None:
+        """Select the persistence sink from settings (WBS 1.1.3).
+
+        When ``ingestion_persist`` is enabled, swap the in-memory sink for the
+        database-backed one so polled observations are stored durably.
+        """
+        settings = settings or get_settings()
+        if settings.ingestion_persist:
+            from app.services.storage import DatabaseObservationSink
+
+            self.sink = DatabaseObservationSink()
+
     def configure(self, settings: Settings | None = None) -> None:
         settings = settings or get_settings()
         locations = [TrackedLocation(**loc) for loc in settings.ingestion_locations]
@@ -36,6 +48,7 @@ class IngestionRuntime:
 
     def start(self, settings: Settings | None = None) -> None:
         settings = settings or get_settings()
+        self.configure_sink(settings)
         if self.scheduler is None:
             self.configure(settings)
         if settings.ingestion_enabled:

@@ -12,8 +12,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from app.core.database import SessionLocal
+from app.models.forecast import Forecast as ForecastModel
+from app.models.forecast import ForecastPoint
 from app.models.weather import Location, Observation
 from app.schemas.weather import CurrentConditions
+from app.schemas.weather import Forecast as ForecastSchema
 from app.services.ingestion import TrackedLocation
 from app.services.normalization import normalise_observation
 
@@ -58,6 +61,31 @@ def store_observation(
     except IntegrityError:
         return False
     return True
+
+
+def store_forecast(
+    db: Session, location: Location, forecast: ForecastSchema, horizon: str = "daily"
+) -> ForecastModel:
+    """Persist a provider forecast run and its points for a location."""
+    row = ForecastModel(
+        location_id=location.id,
+        provider=forecast.provider,
+        horizon=horizon,
+        generated_at=forecast.generated_at,
+        points=[
+            ForecastPoint(
+                valid_at=entry.valid_at,
+                temperature_c=entry.temperature_c,
+                precipitation_mm=entry.precipitation_mm,
+                wind_speed_ms=entry.wind_speed_ms,
+                condition=entry.condition,
+            )
+            for entry in forecast.entries
+        ],
+    )
+    db.add(row)
+    db.flush()
+    return row
 
 
 def recent_observations(

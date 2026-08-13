@@ -26,6 +26,10 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
 
+    # External weather providers (WBS 1.1.1).
+    default_weather_provider: str = "open-meteo"
+    openweather_api_key: str | None = None
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _split_origins(cls, value: object) -> object:

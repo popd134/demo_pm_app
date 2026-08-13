@@ -72,6 +72,23 @@ npm run dev
 # app at http://localhost:5173
 ```
 
+## API documentation
+
+The backend publishes an OpenAPI 3 contract:
+
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **Raw spec**: http://localhost:8000/openapi.json
+
+Export the spec to a file (e.g. for the frontend client in WBS 1.5.1):
+
+```bash
+cd backend
+python -m scripts.export_openapi openapi.json
+```
+
+Authenticate with `POST /api/auth/login`, then send `Authorization: Bearer <token>`.
+
 ## Configuration
 
 Backend settings are read from environment variables (see `backend/.env.example`).

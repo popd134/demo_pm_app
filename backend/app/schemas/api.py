@@ -13,6 +13,19 @@ T = TypeVar("T")
 class LocationCreate(BaseModel):
     """Payload to register a tracked location."""
 
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "name": "London",
+                "latitude": 51.5074,
+                "longitude": -0.1278,
+                "country": "GB",
+                "timezone": "Europe/London",
+                "elevation_m": 11,
+            }
+        }
+    )
+
     name: str = Field(min_length=1, max_length=120)
     latitude: float = Field(ge=-90, le=90)
     longitude: float = Field(ge=-180, le=180)
@@ -34,7 +47,23 @@ class LocationRead(BaseModel):
 
 
 class ObservationRead(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "provider": "open-meteo",
+                "observed_at": "2026-08-05T12:00:00Z",
+                "temperature_c": 21.4,
+                "humidity_pct": 60,
+                "wind_speed_ms": 3.2,
+                "wind_direction_deg": 180,
+                "precipitation_mm": 0.0,
+                "pressure_hpa": 1012.3,
+                "condition": "Partly cloudy",
+            }
+        },
+    )
 
     id: int
     provider: str

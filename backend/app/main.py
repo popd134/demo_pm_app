@@ -11,6 +11,12 @@ from app import __version__
 from app.api.router import api_router
 from app.core.config import get_settings
 from app.core.database import init_db
+from app.core.openapi import (
+    API_DESCRIPTION,
+    CONTACT,
+    LICENSE_INFO,
+    TAGS_METADATA,
+)
 from app.services.ingestion_runtime import runtime as ingestion_runtime
 
 
@@ -36,10 +42,10 @@ def create_app() -> FastAPI:
     app = FastAPI(
         title=settings.app_name,
         version=__version__,
-        description=(
-            "Backend API for the Weather Tracking & Analysis Dashboard. "
-            "Ingests, stores and analyses weather time-series data."
-        ),
+        description=API_DESCRIPTION,
+        openapi_tags=TAGS_METADATA,
+        contact=CONTACT,
+        license_info=LICENSE_INFO,
         lifespan=lifespan,
     )
 

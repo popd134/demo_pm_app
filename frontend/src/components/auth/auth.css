@@ -1,0 +1,40 @@
+/* Auth form styles (WBS 1.6.2). */
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  max-width: 360px;
+}
+.auth-form__title {
+  margin: 0;
+}
+.auth-form__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+.auth-form__field input {
+  padding: 0.55rem 0.75rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-md);
+}
+.auth-form__error {
+  margin: 0;
+  color: var(--color-danger);
+  font-size: var(--font-sm);
+}
+.auth-form__switch {
+  border: none;
+  background: transparent;
+  color: var(--color-accent);
+  font-size: var(--font-sm);
+  cursor: pointer;
+  align-self: flex-start;
+  padding: 0;
+}

@@ -1,0 +1,26 @@
+# Local orchestration of the full stack (WBS 1.7.3).
+#   docker compose up --build
+# Frontend: http://localhost:8080  ·  Backend API: http://localhost:8000/docs
+services:
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: sqlite:////data/weather.db
+      ENVIRONMENT: production
+      CORS_ORIGINS: http://localhost:8080
+      # Override in a real deployment:
+      SECRET_KEY: change-me-in-production
+    volumes:
+      - backend-data:/data
+    ports:
+      - "8000:8000"
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    ports:
+      - "8080:80"
+
+volumes:
+  backend-data:

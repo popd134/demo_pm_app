@@ -1,0 +1,72 @@
+/* Settings screens styles (WBS 1.6.2). */
+
+.settings-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+.settings-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-md);
+}
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+}
+.settings-field--inline {
+  width: 110px;
+}
+.settings-field select,
+.settings-field input,
+.settings-select {
+  padding: 0.5rem 0.6rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--font-md);
+}
+.settings-select {
+  min-width: 220px;
+}
+.settings-subheading {
+  margin: var(--space-sm) 0 0;
+}
+.settings-metric-label {
+  min-width: 150px;
+  font-size: var(--font-sm);
+  font-weight: 600;
+}
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+.settings-saved {
+  color: var(--color-success);
+  font-size: var(--font-sm);
+  font-weight: 600;
+}
+
+.saved-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.saved-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}

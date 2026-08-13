@@ -1,0 +1,23 @@
+/* Alerts list styles (WBS 1.5.4). */
+
+.alerts-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+.alerts-list__item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-muted);
+}
+.alerts-list__message {
+  font-size: var(--font-sm);
+  font-weight: 600;
+}

@@ -1,0 +1,51 @@
+/* Dashboard widget styles (WBS 1.4.3). */
+
+.stat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--space-md);
+}
+
+.stat-tile {
+  background: var(--color-surface-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+}
+.stat-tile__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--font-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted);
+}
+.stat-tile__value {
+  margin-top: var(--space-xs);
+  font-size: var(--font-xl);
+  font-weight: 700;
+}
+.stat-tile__unit {
+  margin-left: 0.25rem;
+  font-size: var(--font-sm);
+  font-weight: 500;
+  color: var(--color-text-muted);
+}
+
+.current-conditions__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+}
+.current-conditions__temp {
+  font-size: var(--font-xxl);
+  font-weight: 700;
+  line-height: 1;
+}
+.current-conditions__meta {
+  margin-top: var(--space-md);
+  font-size: var(--font-xs);
+}

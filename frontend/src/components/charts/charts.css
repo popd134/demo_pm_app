@@ -1,0 +1,110 @@
+/* Chart styling & viz palette (WBS 1.4.4).
+   Series colors are the reference data-viz palette's pre-validated slots 1 (blue)
+   and 2 (orange), stepped per theme. */
+
+.chart {
+  position: relative;
+  --viz-series-1: #2a78d6;
+  --viz-series-2: #eb6834;
+  --viz-grid: var(--color-border);
+  --viz-band: rgba(42, 120, 214, 0.16);
+}
+:root[data-theme="dark"] .chart {
+  --viz-series-1: #3987e5;
+  --viz-series-2: #d95926;
+  --viz-band: rgba(57, 135, 229, 0.22);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .chart {
+    --viz-series-1: #3987e5;
+    --viz-series-2: #d95926;
+    --viz-band: rgba(57, 135, 229, 0.22);
+  }
+}
+
+.chart__svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.chart__grid {
+  stroke: var(--viz-grid);
+  stroke-width: 1;
+  opacity: 0.5;
+}
+
+.chart__axis-label {
+  fill: var(--color-text-muted);
+  font-size: 11px;
+}
+
+.chart__band {
+  fill: var(--viz-band);
+  stroke: none;
+}
+
+.chart__crosshair {
+  stroke: var(--color-text-muted);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.chart__tooltip {
+  position: absolute;
+  top: var(--space-xs);
+  right: var(--space-xs);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.5rem;
+  font-size: var(--font-xs);
+  box-shadow: var(--shadow-card);
+  pointer-events: none;
+}
+
+.chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-md);
+  margin-top: var(--space-sm);
+  font-size: var(--font-xs);
+  color: var(--color-text-muted);
+}
+.chart__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+.chart__swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  display: inline-block;
+}
+.chart__swatch--band {
+  background: var(--viz-band);
+  border: 1px solid var(--viz-series-1);
+}
+
+.chart-toolbar {
+  display: flex;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+.chart-toolbar__button {
+  font-size: var(--font-xs);
+  font-weight: 600;
+  padding: 0.3rem 0.6rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+.chart-toolbar__button--active {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+  border-color: transparent;
+}

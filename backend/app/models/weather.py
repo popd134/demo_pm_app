@@ -9,6 +9,7 @@ belongs to, with a uniqueness constraint that deduplicates repeated readings.
 from __future__ import annotations
 
 from datetime import UTC, datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import (
     DateTime,
@@ -22,6 +23,9 @@ from sqlalchemy import (
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.models.forecast import Forecast
 
 
 def _utcnow() -> datetime:
@@ -40,11 +44,20 @@ class Location(Base):
     name: Mapped[str] = mapped_column(String(120))
     latitude: Mapped[float] = mapped_column(Float)
     longitude: Mapped[float] = mapped_column(Float)
+
+    # Metadata (WBS 1.2.1): useful for display and time-zone-aware analytics.
+    country: Mapped[str | None] = mapped_column(String(80))
+    timezone: Mapped[str | None] = mapped_column(String(64))
+    elevation_m: Mapped[float | None] = mapped_column(Float)
+
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now()
     )
 
     observations: Mapped[list[Observation]] = relationship(
+        back_populates="location", cascade="all, delete-orphan"
+    )
+    forecasts: Mapped[list[Forecast]] = relationship(
         back_populates="location", cascade="all, delete-orphan"
     )
 

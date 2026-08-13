@@ -1,0 +1,117 @@
+/* Layout & navigation styles (WBS 1.4.2). */
+
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-surface);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.layout__brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-weight: 700;
+  font-size: var(--font-lg);
+}
+
+.layout__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.layout__body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 220px 1fr;
+}
+
+.layout__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border-right: 1px solid var(--color-border);
+  background: var(--color-surface);
+}
+
+.layout__nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 0.6rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+.layout__nav-item:hover {
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+.layout__nav-item--active {
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+}
+
+.layout__main {
+  padding: var(--space-lg);
+  max-width: 1200px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-lg);
+}
+
+.dashboard-region--full {
+  grid-column: 1 / -1;
+}
+.dashboard-region--half {
+  grid-column: span 1;
+}
+
+.section-heading {
+  margin: 0 0 var(--space-md);
+  font-size: var(--font-xl);
+}
+.section-subtle {
+  color: var(--color-text-muted);
+}
+
+/* Collapse to a single column on narrow screens (baseline; refined in 1.4.6). */
+@media (max-width: 820px) {
+  .layout__body {
+    grid-template-columns: 1fr;
+  }
+  .layout__sidebar {
+    flex-direction: row;
+    overflow-x: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class AggregateBucketRead(BaseModel):
@@ -34,3 +34,18 @@ class RollingResponse(BaseModel):
     metric: str
     window: int
     points: list[RollingPoint]
+
+
+class AlertRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    location_id: int
+    observation_id: int | None
+    metric: str
+    value: float
+    threshold: float | None
+    kind: str
+    severity: str
+    message: str
+    created_at: datetime

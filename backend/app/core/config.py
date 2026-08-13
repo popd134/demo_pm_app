@@ -35,6 +35,23 @@ class Settings(BaseSettings):
     default_weather_provider: str = "open-meteo"
     openweather_api_key: str | None = None
 
+    # Anomaly detection (WBS 1.3.2).
+    # JSON object of per-metric bounds, e.g. {"temperature_c": {"min": -30, "max": 45}}.
+    anomaly_thresholds: dict[str, dict[str, float]] = {}
+    anomaly_spike_sensitivity: float = 3.0
+
+    @field_validator("anomaly_thresholds", mode="before")
+    @classmethod
+    def _parse_thresholds(cls, value: object) -> object:
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return {}
+            import json
+
+            return json.loads(value)
+        return value
+
     # Provider resilience: retries, rate limiting & caching (WBS 1.1.4).
     provider_max_retries: int = 2
     provider_backoff_base_seconds: float = 0.5

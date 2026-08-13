@@ -10,11 +10,12 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.schemas.analytics import (
     AggregateBucketRead,
+    AlertRead,
     RollingPoint,
     RollingResponse,
     TrendResponse,
 )
-from app.services import queries
+from app.services import alerting, queries
 from app.services.analytics import METRICS, PERIODS, aggregate_series, rolling_average
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
@@ -77,3 +78,24 @@ def rolling(
         window=window,
         points=[RollingPoint(timestamp=ts, value=v) for ts, v in points],
     )
+
+
+@router.get("/locations/{location_id}/alerts", response_model=list[AlertRead])
+def list_alerts(
+    location_id: int,
+    limit: int = Query(default=50, ge=1, le=500),
+    db: Session = Depends(get_db),
+) -> list[AlertRead]:
+    _require_location(db, location_id)
+    return [
+        AlertRead.model_validate(a)
+        for a in alerting.list_alerts(db, location_id, limit=limit)
+    ]
+
+
+@router.post("/locations/{location_id}/evaluate", response_model=list[AlertRead])
+def evaluate(location_id: int, db: Session = Depends(get_db)) -> list[AlertRead]:
+    """Run anomaly detection on the location's latest reading and persist new alerts."""
+    _require_location(db, location_id)
+    created = alerting.evaluate_location(db, location_id)
+    return [AlertRead.model_validate(a) for a in created]

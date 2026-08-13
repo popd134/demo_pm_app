@@ -26,6 +26,11 @@ class Settings(BaseSettings):
 
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000"]
 
+    # Authentication (WBS 1.2.3). Override SECRET_KEY in every real deployment.
+    secret_key: str = "dev-insecure-change-me"
+    jwt_algorithm: str = "HS256"
+    access_token_expire_minutes: int = 60
+
     # External weather providers (WBS 1.1.1).
     default_weather_provider: str = "open-meteo"
     openweather_api_key: str | None = None

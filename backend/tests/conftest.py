@@ -47,3 +47,38 @@ def client() -> TestClient:
     """A FastAPI TestClient bound to a freshly built app."""
     with TestClient(create_app()) as test_client:
         yield test_client
+
+
+def _auth_header(role) -> dict[str, str]:
+    """Create a fresh user with the given role and return a bearer auth header.
+
+    Emails are unique per call because the in-memory DB is shared for the session.
+    """
+    import uuid
+
+    from app.core.database import SessionLocal
+    from app.core.security import create_access_token
+    from app.services.auth import create_user
+
+    db = SessionLocal()
+    try:
+        user = create_user(
+            db, f"{role.value}-{uuid.uuid4().hex[:8]}@test.io", "password123", role=role
+        )
+        return {"Authorization": f"Bearer {create_access_token(str(user.id))}"}
+    finally:
+        db.close()
+
+
+@pytest.fixture()
+def admin_auth() -> dict[str, str]:
+    from app.models.user import UserRole
+
+    return _auth_header(UserRole.ADMIN)
+
+
+@pytest.fixture()
+def user_auth() -> dict[str, str]:
+    from app.models.user import UserRole
+
+    return _auth_header(UserRole.USER)

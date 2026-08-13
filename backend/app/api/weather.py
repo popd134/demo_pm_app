@@ -13,7 +13,9 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from app.api.deps import require_admin
 from app.core.database import get_db
+from app.models.user import User
 from app.schemas.api import (
     ErrorResponse,
     ForecastRead,
@@ -44,7 +46,9 @@ def list_locations(db: Session = Depends(get_db)) -> list[LocationRead]:
 
 @router.post("/locations", response_model=LocationRead, status_code=201)
 def create_location(
-    payload: LocationCreate, db: Session = Depends(get_db)
+    payload: LocationCreate,
+    db: Session = Depends(get_db),
+    _admin: User = Depends(require_admin),
 ) -> LocationRead:
     location = get_or_create_location(
         db, payload.name, payload.latitude, payload.longitude

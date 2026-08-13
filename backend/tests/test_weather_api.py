@@ -65,11 +65,12 @@ def location_id() -> int:
     return _seed_location_with_data("Lisbon", 38.7223, -9.1393)
 
 
-def test_create_and_list_locations(client) -> None:
+def test_create_and_list_locations(client, admin_auth) -> None:
     resp = client.post(
         "/api/weather/locations",
         json={"name": "Madrid", "latitude": 40.4168, "longitude": -3.7038,
               "country": "ES"},
+        headers=admin_auth,
     )
     assert resp.status_code == 201
     created = resp.json()

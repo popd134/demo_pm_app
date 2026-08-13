@@ -63,6 +63,32 @@ def observations_in_range(
     return rows, int(total or 0)
 
 
+def metric_series(
+    db: Session,
+    location_id: int,
+    metric: str,
+    start: datetime | None = None,
+    end: datetime | None = None,
+) -> list[tuple[datetime, float | None]]:
+    """Return ``(observed_at, value)`` samples for one metric, oldest first.
+
+    Used by the analytics engine (WBS 1.3.x). ``metric`` must be a column on
+    :class:`Observation`.
+    """
+    column = getattr(Observation, metric)
+    filters = [Observation.location_id == location_id]
+    if start is not None:
+        filters.append(Observation.observed_at >= start)
+    if end is not None:
+        filters.append(Observation.observed_at <= end)
+    stmt = (
+        select(Observation.observed_at, column)
+        .where(*filters)
+        .order_by(Observation.observed_at.asc())
+    )
+    return [(row[0], row[1]) for row in db.execute(stmt).all()]
+
+
 def latest_forecast(
     db: Session, location_id: int, horizon: str | None = None
 ) -> Forecast | None:

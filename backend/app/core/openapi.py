@@ -38,6 +38,10 @@ TAGS_METADATA = [
         "name": "weather",
         "description": "Query stored locations, observations and forecasts.",
     },
+    {
+        "name": "analytics",
+        "description": "Trends, aggregates, anomalies and forecast-accuracy metrics.",
+    },
 ]
 
 CONTACT = {"name": "Weather Dashboard Team", "url": "https://github.com/pop134/sample_PM_v2"}

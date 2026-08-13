@@ -27,6 +27,21 @@ def _setup_schema() -> None:
     Base.metadata.drop_all(bind=engine)
 
 
+@pytest.fixture(autouse=True)
+def _reset_provider_resilience():
+    """Clear provider cache/limiters and disable real sleeps between tests (WBS 1.1.4)."""
+    from app.services.providers import resilience
+
+    async def _no_sleep(_seconds: float) -> None:
+        return None
+
+    resilience.reset()
+    resilience.set_sleep(_no_sleep)
+    yield
+    resilience.reset_sleep()
+    resilience.reset()
+
+
 @pytest.fixture()
 def client() -> TestClient:
     """A FastAPI TestClient bound to a freshly built app."""

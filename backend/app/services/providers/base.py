@@ -35,8 +35,42 @@ class WeatherProvider(ABC):
         self._client = client
 
     async def _request(self, path: str, params: dict[str, object]) -> dict:
-        """Perform a GET request and return decoded JSON, wrapping transport errors."""
+        """Perform a GET request and return decoded JSON.
+
+        Wraps the raw call with response caching, per-provider rate limiting and
+        exponential-backoff retries (WBS 1.1.4).
+        """
+        # Imported here to avoid a circular import at module load.
+        from app.core.config import get_settings
+        from app.services.providers import resilience
+
         url = path if path.startswith("http") else f"{self.base_url}{path}"
+        settings = get_settings()
+
+        cache = resilience.get_cache()
+        key = resilience.make_cache_key(self.name, url, params)
+        cached = cache.get(key)
+        if cached is not None:
+            return cached
+
+        limiter = resilience.get_rate_limiter(
+            self.name, settings.provider_rate_limit_per_minute
+        )
+
+        async def _call() -> dict:
+            await limiter.acquire()
+            return await self._raw_get(url, params)
+
+        data = await resilience.with_retries(
+            _call,
+            retries=settings.provider_max_retries,
+            backoff_base=settings.provider_backoff_base_seconds,
+        )
+        cache.set(key, data, settings.provider_cache_ttl_seconds)
+        return data
+
+    async def _raw_get(self, url: str, params: dict[str, object]) -> dict:
+        """Perform a single GET request, wrapping transport errors as ProviderError."""
         try:
             if self._client is not None:
                 response = await self._client.get(url, params=params)
@@ -47,10 +81,10 @@ class WeatherProvider(ABC):
             return response.json()
         except httpx.HTTPStatusError as exc:  # non-2xx
             raise ProviderError(
-                f"{self.name} returned HTTP {exc.response.status_code} for {path}"
+                f"{self.name} returned HTTP {exc.response.status_code} for {url}"
             ) from exc
         except httpx.HTTPError as exc:  # transport / timeout / decode
-            raise ProviderError(f"{self.name} request to {path} failed: {exc}") from exc
+            raise ProviderError(f"{self.name} request to {url} failed: {exc}") from exc
 
     @abstractmethod
     async def get_current(self, location: GeoPoint) -> CurrentConditions:

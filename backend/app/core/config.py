@@ -30,6 +30,13 @@ class Settings(BaseSettings):
     default_weather_provider: str = "open-meteo"
     openweather_api_key: str | None = None
 
+    # Provider resilience: retries, rate limiting & caching (WBS 1.1.4).
+    provider_max_retries: int = 2
+    provider_backoff_base_seconds: float = 0.5
+    provider_cache_ttl_seconds: float = 300.0
+    # Per-provider request cap; 0 disables throttling.
+    provider_rate_limit_per_minute: int = 0
+
     # Scheduled ingestion (WBS 1.1.2).
     ingestion_enabled: bool = False
     ingestion_interval_seconds: float = 900.0

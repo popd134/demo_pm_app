@@ -30,6 +30,26 @@ class Settings(BaseSettings):
     default_weather_provider: str = "open-meteo"
     openweather_api_key: str | None = None
 
+    # Scheduled ingestion (WBS 1.1.2).
+    ingestion_enabled: bool = False
+    ingestion_interval_seconds: float = 900.0
+    # JSON list of {"name","latitude","longitude"} objects, e.g.
+    # '[{"name":"London","latitude":51.5074,"longitude":-0.1278}]'
+    ingestion_locations: list[dict] = []
+
+    @field_validator("ingestion_locations", mode="before")
+    @classmethod
+    def _parse_locations(cls, value: object) -> object:
+        """Allow the tracked-location list to be supplied as a JSON string."""
+        if isinstance(value, str):
+            value = value.strip()
+            if not value:
+                return []
+            import json
+
+            return json.loads(value)
+        return value
+
     @field_validator("cors_origins", mode="before")
     @classmethod
     def _split_origins(cls, value: object) -> object:

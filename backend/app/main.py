@@ -11,13 +11,22 @@ from app import __version__
 from app.api.router import api_router
 from app.core.config import get_settings
 from app.core.database import init_db
+from app.services.ingestion_runtime import runtime as ingestion_runtime
 
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    """Create database tables on startup (migrations arrive in WBS 1.7)."""
+    """Start-up / shut-down wiring.
+
+    Creates database tables (migrations arrive in WBS 1.7) and starts the scheduled
+    ingestion loop when it is enabled (WBS 1.1.2).
+    """
     init_db()
-    yield
+    ingestion_runtime.start()
+    try:
+        yield
+    finally:
+        await ingestion_runtime.stop()
 
 
 def create_app() -> FastAPI:

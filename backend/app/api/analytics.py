@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -11,12 +11,18 @@ from app.core.database import get_db
 from app.schemas.analytics import (
     AggregateBucketRead,
     AlertRead,
+    ForecastAccuracyResponse,
     RollingPoint,
     RollingResponse,
     TrendResponse,
 )
 from app.services import alerting, queries
 from app.services.analytics import METRICS, PERIODS, aggregate_series, rolling_average
+from app.services.forecast_accuracy import (
+    COMPARABLE_METRICS,
+    error_metrics,
+    match_series,
+)
 
 router = APIRouter(prefix="/analytics", tags=["analytics"])
 
@@ -77,6 +83,53 @@ def rolling(
         metric=metric,
         window=window,
         points=[RollingPoint(timestamp=ts, value=v) for ts, v in points],
+    )
+
+
+@router.get(
+    "/locations/{location_id}/forecast-accuracy",
+    response_model=ForecastAccuracyResponse,
+)
+def forecast_accuracy(
+    location_id: int,
+    metric: str = Query(default="temperature_c"),
+    horizon: str | None = Query(default=None, pattern="^(hourly|daily)$"),
+    tolerance_minutes: int = Query(default=60, ge=1, le=1440),
+    db: Session = Depends(get_db),
+) -> ForecastAccuracyResponse:
+    """Compare the latest stored forecast against observed readings (MAE/RMSE/bias)."""
+    _require_location(db, location_id)
+    if metric not in COMPARABLE_METRICS:
+        raise HTTPException(
+            status_code=422,
+            detail=f"metric must be one of {sorted(COMPARABLE_METRICS)}",
+        )
+    forecast = queries.latest_forecast(db, location_id, horizon=horizon)
+    if forecast is None:
+        raise HTTPException(status_code=404, detail="no forecast stored for location")
+
+    predicted = [(p.valid_at, getattr(p, metric)) for p in forecast.points]
+    times = [t for t, _ in predicted]
+    tolerance = timedelta(minutes=tolerance_minutes)
+    if times:
+        actual = queries.metric_series(
+            db, location_id, metric, start=min(times) - tolerance,
+            end=max(times) + tolerance,
+        )
+    else:
+        actual = []
+    pairs = match_series(predicted, actual, tolerance)
+    metrics = error_metrics(metric, pairs)
+    return ForecastAccuracyResponse(
+        location_id=location_id,
+        metric=metric,
+        horizon=horizon,
+        forecast_id=forecast.id,
+        generated_at=forecast.generated_at,
+        sample_count=metrics.sample_count,
+        mae=metrics.mae,
+        rmse=metrics.rmse,
+        bias=metrics.bias,
     )
 
 

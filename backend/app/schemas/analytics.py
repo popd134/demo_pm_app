@@ -36,6 +36,18 @@ class RollingResponse(BaseModel):
     points: list[RollingPoint]
 
 
+class ForecastAccuracyResponse(BaseModel):
+    location_id: int
+    metric: str
+    horizon: str | None
+    forecast_id: int
+    generated_at: datetime
+    sample_count: int
+    mae: float | None
+    rmse: float | None
+    bias: float | None
+
+
 class AlertRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 

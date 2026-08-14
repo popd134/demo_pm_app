@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
+import { Badge, Button, Card } from "./components/ui";
+import { useTheme } from "./design/ThemeProvider";
 import { getHealth, type HealthResponse } from "./lib/api";
 
 /**
- * Application shell. The full dashboard layout (navigation, widget grid, theming)
- * is delivered by WBS tasks 1.4.x. This foundation shell renders the app frame and
- * verifies backend connectivity via the health endpoint.
+ * Application shell (WBS 1.4.1).
+ *
+ * Establishes the design-system-driven frame: header with theme toggle, a content
+ * area and footer. The full dashboard layout and widgets arrive in WBS 1.4.2+.
  */
 export default function App() {
+  const { theme, toggleTheme } = useTheme();
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -16,21 +20,29 @@ export default function App() {
       .catch(() => setError("Backend unreachable"));
   }, []);
 
+  const apiTone = error ? "danger" : health ? "success" : "neutral";
+  const apiLabel = error ? "API offline" : health ? `API ${health.status}` : "Connecting…";
+
   return (
     <div className="app-shell">
       <header className="app-header">
         <h1>Weather Tracking &amp; Analysis Dashboard</h1>
-        <span className="badge" data-state={error ? "down" : health ? "up" : "pending"}>
-          {error ? "API offline" : health ? `API ${health.status}` : "Connecting…"}
-        </span>
+        <div style={{ display: "flex", alignItems: "center", gap: "var(--space-md)" }}>
+          <Badge tone={apiTone}>{apiLabel}</Badge>
+          <Button variant="ghost" onClick={toggleTheme} aria-label="Toggle theme">
+            {theme === "dark" ? "☀️ Light" : "🌙 Dark"}
+          </Button>
+        </div>
       </header>
 
       <main className="app-main">
-        <section className="placeholder-card">
-          <h2>Dashboard coming online</h2>
-          <p>
-            This is the project foundation. Current-conditions widgets, trend charts and
-            location selection land in the Dashboard UI requirement (WBS 1.4).
+        <Card
+          title="Dashboard coming online"
+          subtitle="This PR establishes the design system: tokens, theming and shared UI components."
+        >
+          <p style={{ color: "var(--color-text-muted)" }}>
+            Current-conditions widgets, trend charts and location selection land in the
+            Dashboard UI requirement (WBS 1.4.2+).
           </p>
           {health && (
             <dl className="meta">
@@ -48,7 +60,7 @@ export default function App() {
               </div>
             </dl>
           )}
-        </section>
+        </Card>
       </main>
 
       <footer className="app-footer">
